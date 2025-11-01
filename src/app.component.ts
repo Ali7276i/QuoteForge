@@ -1,3 +1,4 @@
+
 import { Component, ChangeDetectionStrategy, signal, ElementRef, viewChild, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -6,7 +7,7 @@ import { RewardedAdModalComponent } from './components/rewarded-ad-modal/rewarde
 
 declare var html2canvas: any;
 
-type TextAlign = 'left' | 'center' | 'right';
+type Language = 'ar' | 'en';
 
 @Component({
   selector: 'app-root',
@@ -22,11 +23,18 @@ type TextAlign = 'left' | 'center' | 'right';
 export class AppComponent {
   quoteCanvas = viewChild.required<ElementRef>('quoteCanvas');
 
-  userQuote = signal("اكتب اقتباسك هنا");
+  language = signal<Language>('ar');
+
+  private initialQuotes = {
+    ar: "اكتب اقتباسك هنا",
+    en: "Write your quote here"
+  };
+
+  userQuote = signal(this.initialQuotes.ar);
   textColor = signal('#FFFFFF');
   fontSize = signal(24);
-  textAlign = signal<TextAlign>('right');
   fontFamily = signal('Georgia');
+  backgroundImageUrl = signal('https://images.pexels.com/photos/2310641/pexels-photo-2310641.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
   
   canDownloadWithoutWatermark = signal(false);
   isAdModalOpen = signal(false);
@@ -34,10 +42,70 @@ export class AppComponent {
   
   fonts = ['Arial', 'Verdana', 'Georgia', 'Times New Roman', 'Courier New', 'Impact'];
   
+  backgroundImages = [
+    'https://images.pexels.com/photos/2310641/pexels-photo-2310641.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/3244513/pexels-photo-3244513.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/1528640/pexels-photo-1528640.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/1423600/pexels-photo-1423600.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  ];
+
+  private translations = {
+    ar: {
+      quoteTextLabel: 'نص الاقتباس',
+      textColorLabel: 'لون النص',
+      fontFamilyLabel: 'نوع الخط',
+      backgroundLabel: 'اختر الخلفية',
+      uploadLabel: 'رفع صورة',
+      fontSizeLabel: 'حجم الخط',
+      adPlaceholder: 'مساحة إعلانية',
+      downloadButton: 'إنشاء وتنزيل',
+      processingButton: 'جاري المعالجة...',
+      watermark: 'QuoteForge.app'
+    },
+    en: {
+      quoteTextLabel: 'Quote Text',
+      textColorLabel: 'Text Color',
+      fontFamilyLabel: 'Font Family',
+      backgroundLabel: 'Choose Background',
+      uploadLabel: 'Upload Image',
+      fontSizeLabel: 'Font Size',
+      adPlaceholder: 'Ad Space',
+      downloadButton: 'Create and Download',
+      processingButton: 'Processing...',
+      watermark: 'QuoteForge.app'
+    }
+  };
+
+  t = computed(() => this.translations[this.language()]);
+
   showWatermark = computed(() => !this.canDownloadWithoutWatermark() && !this.isCapturing());
 
-  changeAlignment(align: TextAlign) {
-    this.textAlign.set(align);
+  setLanguage(lang: Language) {
+    this.language.set(lang);
+    // Only change the quote if it's still the default placeholder
+    if (this.userQuote() === this.initialQuotes.ar || this.userQuote() === this.initialQuotes.en) {
+      this.userQuote.set(this.initialQuotes[lang]);
+    }
+  }
+
+  changeBackground(url: string) {
+    this.backgroundImageUrl.set(url);
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = (e: any) => {
+        this.backgroundImageUrl.set(e.target.result);
+      };
+      
+      reader.readAsDataURL(file);
+    }
   }
 
   onGenerateAndDownload() {

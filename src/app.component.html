@@ -1,32 +1,37 @@
-
-<main class="h-screen w-screen bg-slate-900 text-white flex flex-col md:flex-row-reverse overflow-hidden" dir="rtl">
+<main class="h-screen w-screen bg-slate-900 text-white flex flex-col md:flex-row-reverse overflow-hidden" [dir]="language() === 'ar' ? 'rtl' : 'ltr'">
   <!-- Controls Panel -->
   <aside class="w-full md:w-80 lg:w-96 bg-slate-800/80 backdrop-blur-sm md:border-r border-slate-700/50 p-6 flex flex-col space-y-6 overflow-y-auto">
-    <div class="flex items-center space-x-3">
-       <svg class="w-8 h-8 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-      </svg>
-      <h1 class="text-2xl font-bold text-slate-100">QuoteForge</h1>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-3 rtl:space-x-reverse">
+         <svg class="w-8 h-8 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+        </svg>
+        <h1 class="text-2xl font-bold text-slate-100">QuoteForge</h1>
+      </div>
+      <div class="flex items-center border border-slate-600 rounded-full">
+        <button (click)="setLanguage('en')" class="px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200" [class]="language() === 'en' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-700'">EN</button>
+        <button (click)="setLanguage('ar')" class="px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200" [class]="language() === 'ar' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-700'">AR</button>
+      </div>
     </div>
 
     <!-- Quote Text Input -->
-    <div>
-      <label for="quoteText" class="block text-sm font-medium text-slate-400 mb-2">نص الاقتباس</label>
+    <div class="border-t border-slate-700/50 pt-6">
+      <label for="quoteText" class="block text-sm font-medium text-slate-400 mb-2">{{ t().quoteTextLabel }}</label>
       <textarea id="quoteText" name="quoteText" rows="4" [(ngModel)]="userQuote" class="w-full bg-slate-700/50 border border-slate-600 rounded-lg p-3 text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></textarea>
     </div>
 
     <!-- Text Color -->
     <div>
-      <label for="textColor" class="block text-sm font-medium text-slate-400 mb-2">لون النص</label>
+      <label for="textColor" class="block text-sm font-medium text-slate-400 mb-2">{{ t().textColorLabel }}</label>
       <div class="relative">
         <input id="textColor" name="textColor" type="color" [(ngModel)]="textColor" class="p-0 h-10 w-full bg-slate-700/50 border border-slate-600 rounded-lg cursor-pointer">
-         <span class="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-sm uppercase text-slate-400 pointer-events-none">{{ textColor() }}</span>
+         <span class="absolute right-3 rtl:left-3 rtl:right-auto top-1/2 -translate-y-1/2 font-mono text-sm uppercase text-slate-400 pointer-events-none">{{ textColor() }}</span>
       </div>
     </div>
     
     <!-- Font Family -->
     <div>
-      <label for="fontFamily" class="block text-sm font-medium text-slate-400 mb-2">نوع الخط</label>
+      <label for="fontFamily" class="block text-sm font-medium text-slate-400 mb-2">{{ t().fontFamilyLabel }}</label>
       <select id="fontFamily" name="fontFamily" [(ngModel)]="fontFamily" class="w-full bg-slate-700/50 border border-slate-600 rounded-lg p-2.5 text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
         @for(font of fonts; track font) {
           <option [value]="font">{{font}}</option>
@@ -34,26 +39,30 @@
       </select>
     </div>
 
-    <!-- Font Size -->
+    <!-- Background Image -->
     <div>
-      <label for="fontSize" class="block text-sm font-medium text-slate-400 mb-2">حجم الخط ({{ fontSize() }}px)</label>
-      <input id="fontSize" name="fontSize" type="range" min="12" max="128" step="1" [(ngModel)]="fontSize" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+      <label class="block text-sm font-medium text-slate-400 mb-2">{{ t().backgroundLabel }}</label>
+      <div class="grid grid-cols-3 gap-2">
+        @for(bg of backgroundImages; track bg) {
+          <button (click)="changeBackground(bg)"
+                  [style.backgroundImage]="'url(' + bg + ')'"
+                  [class]="'w-full aspect-square bg-cover bg-center rounded-md transition hover:opacity-80 ring-offset-2 ring-offset-slate-800 ' + (backgroundImageUrl() === bg ? 'ring-2 ring-indigo-500' : '')">
+          </button>
+        }
+        <label for="backgroundUpload" class="w-full aspect-square bg-slate-700/50 border-2 border-dashed border-slate-600 rounded-md flex flex-col items-center justify-center text-slate-400 hover:bg-slate-700 hover:border-indigo-500 cursor-pointer transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+          </svg>
+          <span class="text-xs font-semibold">{{ t().uploadLabel }}</span>
+          <input id="backgroundUpload" type="file" class="hidden" accept="image/*" (change)="onFileSelected($event)">
+        </label>
+      </div>
     </div>
 
-    <!-- Text Alignment -->
+    <!-- Font Size -->
     <div>
-      <label class="block text-sm font-medium text-slate-400 mb-2">المحاذاة</label>
-      <div class="grid grid-cols-3 gap-2 bg-slate-700/50 p-1 rounded-lg">
-        <button (click)="changeAlignment('left')" [class]="'p-2 rounded-md transition ' + (textAlign() === 'left' ? 'bg-indigo-600' : 'hover:bg-slate-600')">
-          <svg class="w-5 h-5 mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm0 5.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75ZM2 4.75A.75.75 0 0 1 2.75 4h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 2 10Zm0 5.25a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" /></svg>
-        </button>
-        <button (click)="changeAlignment('center')" [class]="'p-2 rounded-md transition ' + (textAlign() === 'center' ? 'bg-indigo-600' : 'hover:bg-slate-600')">
-           <svg class="w-5 h-5 mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm0 5.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75ZM4.25 5.5h11.5a.75.75 0 0 1 0-1.5H4.25a.75.75 0 0 1 0 1.5ZM4.25 10.75h11.5a.75.75 0 0 1 0-1.5H4.25a.75.75 0 0 1 0 1.5ZM4.25 16h11.5a.75.75 0 0 1 0-1.5H4.25a.75.75 0 0 1 0 1.5Z" clip-rule="evenodd" /></svg>
-        </button>
-        <button (click)="changeAlignment('right')" [class]="'p-2 rounded-md transition ' + (textAlign() === 'right' ? 'bg-indigo-600' : 'hover:bg-slate-600')">
-           <svg class="w-5 h-5 mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm0 5.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75ZM9.25 4.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75ZM9.25 10a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75Zm.75 4.5a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5h-7.5Z" clip-rule="evenodd" /></svg>
-        </button>
-      </div>
+      <label for="fontSize" class="block text-sm font-medium text-slate-400 mb-2">{{ t().fontSizeLabel }} ({{ fontSize() }}px)</label>
+      <input id="fontSize" name="fontSize" type="range" min="12" max="128" step="1" [(ngModel)]="fontSize" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
     </div>
     
     <!-- Download Button -->
@@ -62,17 +71,17 @@
        <div class="ad-placeholder-banner mb-6">
         <div class="w-full h-[100px] bg-slate-700/50 border-2 border-dashed border-slate-600 rounded-lg flex items-center justify-center text-center text-slate-500">
           <div>
-              <p class="font-semibold">مساحة إعلانية</p>
+              <p class="font-semibold">{{ t().adPlaceholder }}</p>
           </div>
         </div>
       </div>
       <button (click)="onGenerateAndDownload()" [disabled]="isCapturing()" class="w-full flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-800 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-indigo-500">
         @if(isCapturing()) {
           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-          <span>جاري المعالجة...</span>
+          <span>{{ t().processingButton }}</span>
         } @else {
-          <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z" /><path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z" /></svg>
-          <span>إنشاء وتنزيل</span>
+          <svg class="w-5 h-5 mx-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z" /><path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z" /></svg>
+          <span>{{ t().downloadButton }}</span>
         }
       </button>
     </div>
@@ -80,22 +89,21 @@
 
   <!-- Image Preview Panel -->
   <div class="flex-1 bg-gray-900 flex items-center justify-center p-4 md:p-8 overflow-hidden">
-    <div #quoteCanvas class="relative w-full h-full max-w-[1280px] max-h-[720px] aspect-video rounded-lg shadow-2xl bg-cover bg-center" style="background-image: url('https://images.pexels.com/photos/2310641/pexels-photo-2310641.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');">
+    <div #quoteCanvas class="relative w-full h-full max-w-[1280px] max-h-[720px] aspect-video rounded-lg shadow-2xl bg-cover bg-center transition-all duration-500" [style.backgroundImage]="'url(' + backgroundImageUrl() + ')'">
       <!-- Quote Text (Draggable) -->
       <div cdkDrag cdkDragBoundary=".relative"
            [style.color]="textColor()" 
            [style.fontSize.px]="fontSize()" 
-           [style.textAlign]="textAlign()"
            [style.fontFamily]="fontFamily()"
            [style.text-shadow]="'2px 2px 8px rgba(0,0,0,0.7)'"
-           class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 cursor-move w-3/4 whitespace-pre-wrap break-words">
+           class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 cursor-move max-w-[95%] whitespace-pre-wrap break-words text-center">
         {{ userQuote() }}
       </div>
 
       <!-- Watermark -->
       @if (showWatermark()) {
-        <div class="absolute bottom-4 left-5 text-white/50 text-sm font-sans select-none pointer-events-none">
-          QuoteForge.app
+        <div class="absolute bottom-4 left-5 rtl:left-auto rtl:right-5 text-white/50 text-sm font-sans select-none pointer-events-none">
+          {{ t().watermark }}
         </div>
       }
     </div>
@@ -105,6 +113,7 @@
 <!-- Ad Modal -->
 @if (isAdModalOpen()) {
   <app-rewarded-ad-modal 
+    [language]="language()"
     (adCompleted)="onAdCompletedSuccessfully()"
     (closeModal)="closeRewardedAdModal()">
   </app-rewarded-ad-modal>

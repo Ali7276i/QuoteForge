@@ -1,6 +1,8 @@
 
-import { Component, ChangeDetectionStrategy, output, signal, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, output, signal, OnDestroy, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+type Language = 'ar' | 'en';
 
 @Component({
   selector: 'app-rewarded-ad-modal',
@@ -9,26 +11,49 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule]
 })
 export class RewardedAdModalComponent implements OnDestroy {
+  language = input.required<Language>();
   adCompleted = output<void>();
   closeModal = output<void>();
 
   isLoading = signal(false);
   countdown = signal(5);
   adWatched = signal(false);
-  // FIX: Correct the type to be compatible with both browser (number) and Node (Timeout) environments.
+  
   private countdownInterval: ReturnType<typeof setInterval> | undefined;
 
+  private translations = {
+    ar: {
+      title: 'تنزيل بدون علامة مائية',
+      description: 'شاهد إعلانًا قصيرًا لفتح تنزيل عالي الجودة وخالي من العلامات المائية لصورتك.',
+      watchAdButton: 'مشاهدة الإعلان',
+      adRunningText: 'الإعلان قيد التشغيل... يرجى الانتظار',
+      successMessage: 'شكراً للمشاهدة! التنزيل الخاص بك جاهز.',
+      downloadNowButton: 'تنزيل الآن',
+      cancelButton: 'إلغاء'
+    },
+    en: {
+      title: 'Download without Watermark',
+      description: 'Watch a short ad to unlock a high-quality, watermark-free download of your image.',
+      watchAdButton: 'Watch Ad',
+      adRunningText: 'Ad is running... Please wait',
+      successMessage: 'Thanks for watching! Your download is ready.',
+      downloadNowButton: 'Download Now',
+      cancelButton: 'Cancel'
+    }
+  };
+
+  t = computed(() => this.translations[this.language()]);
+
+
   simulateAd() {
-    console.log("يتم الآن محاكاة مشاهدة الإعلان المكافِئ...");
+    console.log("Simulating rewarded ad view...");
 
     // *************************************************************
-    // المنطقة التي سيتم فيها إضافة كود الإعلان المكافِئ الفعلي:
-    
+    // This is where you would integrate your actual rewarded ad SDK
     /*
-    1. هنا يتم تشغيل مكتبة الإعلان الفعلية (AdMob/AdSense).
-    2. يتم تنفيذ الكود أدناه فقط بعد تأكيد نجاح الإعلان من المكتبة.
+    1. Trigger the ad library (AdMob/AdSense etc.).
+    2. The code below should only run on the success callback from the library.
     */
-    
     // *************************************************************
 
     this.isLoading.set(true);
@@ -40,7 +65,7 @@ export class RewardedAdModalComponent implements OnDestroy {
         this.countdownInterval = undefined;
         this.adWatched.set(true);
         this.isLoading.set(false);
-        console.log("تمت مشاهدة الإعلان بنجاح (محاكاة)!");
+        console.log("Ad successfully watched (simulated)!");
       }
     }, 1000);
   }
