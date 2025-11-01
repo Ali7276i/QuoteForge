@@ -1,7 +1,6 @@
-
 import { Component, ChangeDetectionStrategy, signal, ElementRef, viewChild, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CdkDrag } from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
 import { RewardedAdModalComponent } from './components/rewarded-ad-modal/rewarded-ad-modal.component';
 
@@ -16,7 +15,7 @@ type TextAlign = 'left' | 'center' | 'right';
   imports: [
     CommonModule,
     FormsModule,
-    CdkDrag,
+    DragDropModule,
     RewardedAdModalComponent
   ]
 })
